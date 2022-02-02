@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script> 
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <title>React Basic</title>
+  <style>
+    .title{
+      color:brown;
+    }
+    .catContainer{
+      display: flex;
+    }
+    .catWrapper{
+      position: relative;
+    }
+    .catImg{
+      width:200px;
+    }
+    .catBtn{
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      border-radius: 50%;
+      padding:5px;
+      border:none;
+      outline: none;
+    }  
+
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const div = document.querySelector("#root")
+    const button = document.querySelector("button")
+
+    function Title({test1,test2}){
+      return(
+        <div>   
+          <h1 className = "title">{test1} {test2}</h1> 
+        </div>
+      )
+    }
+  
+    const Cat = ({x,onHeartClick})=>{
+
+        return (
+        <div className="catWrapper">
+          <img className="catImg" src={x} />
+          <button className="catBtn" onClick={onHeartClick} >💙</button>
+        </div>
+      )
+    }  
+
+    function Input({updateImages}){
+      const [inputValue,setInputValue] = React.useState("")
+      const [submitError, setSubmitError] = React.useState("")
+      const handleInput = (e)=>{
+        setInputValue(e.target.value.toUpperCase()) 
+        setSubmitError("")}
+      const handleSubmit = (e)=>{
+        e.preventDefault()
+        if(inputValue===""){
+          setSubmitError("공백으로 서브밋은 안됩니다")
+          return;
+        }
+        updateImages()
+    }
+
+      return(
+        <form onSubmit={handleSubmit}>
+          <input type="text" placeholder="아무거나 입력해보세요^^" onChange={handleInput} value={inputValue}/>
+          <button>Submit</button>
+          {submitError?<p style={{color:"red"}}>{submitError}</p>:null}
+        </form>)
+    }
+
+  const App =  () => { 
+    /* const images = ["./moya.jpg", "./baozi.jpg", "./nicai.jpg", "./moya-2.jpg"] */
+    const [heartCounter, setHeartCounter] = React.useState(Number(localStorage.getItem("count")) || 0)
+    const [imageCounter, setImageCounter] = React.useState(JSON.parse(localStorage.getItem("image"))||["./moya.jpg","./baozi.jpg"])
+    const handleHeartClick = (e)=>{
+        setHeartCounter(prev => prev+1)
+        console.log(heartCounter)
+        localStorage.setItem("count", heartCounter+1) 
+      }
+    const updateImages = ()=>{
+      const newImage = ["./nicai.jpg","./moya-2.jpg"]
+      setImageCounter(newImage)
+      localStorage.setItem("image",JSON.stringify(newImage))
+    }
+      return (
+        <div className="app">
+        <Title test1="Cats" test2={heartCounter}/>
+        <div className="catContainer">
+          <Cat x={imageCounter[0]}  onHeartClick={handleHeartClick} />
+          <Cat x={imageCounter[1]} onHeartClick={handleHeartClick}/>
+        </div>
+        <Input updateImages={updateImages}/>
+      </div>
+      )
+  }
+
+    ReactDOM.render(<App/>, div)
+  </script>
+</body>
+</html>
